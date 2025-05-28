@@ -77,7 +77,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
       }
     | undefined
   >();
-  const [drawAnim] = useState(new Animated.Value(0));
   const [player1DrawEffect, setPlayer1DrawEffect] = useState<number | null>(null);
   const [player2DrawEffect, setPlayer2DrawEffect] = useState<number | null>(null);
   const player1FadeAnim = useRef(new Animated.Value(0)).current;
@@ -276,27 +275,11 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
   };
 
   const handleDrawCard = () => {
-    Animated.sequence([
-      Animated.timing(drawAnim, {
-        toValue: 10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(drawAnim, {
-        toValue: -10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(drawAnim, {
-        toValue: 0,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  
-    handleDraw(onNextTurn);
+    if (isPlayerTurn) {
+      handleDraw(onNextTurn);
+    }
   };
-  
+
   const shouldShowUnoButton = player1Hand.length === 2;
 
   return (
@@ -362,31 +345,26 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
               </Text>
             </Text>
             <View style={[styles.piles, styles.pilesWithSpacing]}>
-              <TouchableOpacity
-                style={styles.drawPile}
-                onPress={handleDrawCard}
-              >
-                <Animated.View
-                  style={[{ transform: [{ translateX: drawAnim }] }]}
-                >
-                  <Card
-                    card={{
-                      color: null,
-                      value: "back",
-                      type: "number",
-                      order: 1,
-                    }}
-                    isBack={true}
-                    isPlayable={false}
-                    colorBlindMode={colorBlindMode}
-                    onPress={() => {}}
-                    order={1}
-                  />
-                  <Text style={styles.pileText}>
-                    Draw (<Text style={styles.boldText}>{deck.length}</Text>)
-                  </Text>
-                </Animated.View>
-              </TouchableOpacity>
+              <View style={styles.drawPile}>
+                <Card
+                  card={{
+                    color: null,
+                    value: "back",
+                    type: "number",
+                    order: 1,
+                  }}
+                  isBack={true}
+                  isPlayable={isPlayerTurn}
+                  colorBlindMode={colorBlindMode}
+                  onPress={handleDrawCard}
+                  order={1}
+                  animate={true}
+                  style={styles.card}
+                />
+                <Text style={styles.pileText}>
+                  Draw (<Text style={styles.boldText}>{deck.length}</Text>)
+                </Text>
+              </View>
 
               <View style={styles.discardPile}>
                 {discardPile.length > 0 ? (

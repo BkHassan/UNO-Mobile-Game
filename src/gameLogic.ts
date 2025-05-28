@@ -11,20 +11,16 @@ export const createDeck = (): CardType[] => {
   const deck: CardType[] = [];
 
   COLORS.forEach((color) => {
-    // Number 0 (1 per color)
     deck.push({ color, value: "0", type: "number", order: 1 });
-    // Numbers 1–9 (2 per color)
     NUMBERS.slice(1).forEach((number) => {
       deck.push({ color, value: number, type: "number", order: 1 });
       deck.push({ color, value: number, type: "number", order: 2 });
     });
-    // Action cards (2 per color)
     ACTIONS.forEach((action) => {
       deck.push({ color, value: action, type: "action", order: 1 });
       deck.push({ color, value: action, type: "action", order: 2 });
     });
   });
-  // Wild cards (4 each)
   WILDS.forEach((wild) => {
     for (let i = 1; i <= 4; i++) {
       deck.push({ color: null, value: wild, type: "wild", order: i });
@@ -76,8 +72,6 @@ export const loadGameState = async (
   }
 };
 
-// Simplified drawCards function - no longer used in the new implementation
-// but kept for backward compatibility
 export const drawCards = (
   count: number,
   deck: CardType[],
@@ -92,7 +86,6 @@ export const drawCards = (
   let newDeck = [...deck];
   let newDiscardPile = [...discardPile];
 
-  // Check if we need to reshuffle
   if (newDeck.length < count && newDiscardPile.length > 1) {
     const cardsToShuffle = newDiscardPile.slice(1);
     newDeck = [...newDeck, ...shuffleDeck(cardsToShuffle)];
@@ -115,8 +108,6 @@ export const drawCards = (
   saveGameState();
 };
 
-// Simplified playBotTurn - this is now mostly handled in useGameLogic
-// but kept for any external usage
 export const playBotTurn = (
   player2Hand: CardType[],
   discardPile: CardType[],
@@ -154,7 +145,6 @@ export const playBotTurn = (
   );
 
   if (playableCards.length > 0) {
-    // Bot strategy: prefer action cards and wilds
     const actionCards = playableCards.filter(
       (card) => card.type === "action" || card.type === "wild"
     );
@@ -166,7 +156,6 @@ export const playBotTurn = (
     const cardIndex = player2Hand.indexOf(cardToPlay);
 
     if (cardToPlay.type === "wild") {
-      // Choose the most common color in bot's hand
       const colorCounts = player2Hand.reduce((counts, card) => {
         if (card.color) counts[card.color] = (counts[card.color] || 0) + 1;
         return counts;
@@ -187,10 +176,8 @@ export const playBotTurn = (
       });
     }
 
-    // Play the card
     playCard(cardToPlay, cardIndex, true);
   } else {
-    // Bot needs to draw a card
     if (deck && setDeck) {
       drawCardsFunction(
         1,
@@ -205,12 +192,10 @@ export const playBotTurn = (
   }
 };
 
-// Helper function to get a random color (useful for wild cards)
 export const getRandomColor = (): CardColor => {
   return COLORS[Math.floor(Math.random() * COLORS.length)];
 };
 
-// Helper function to calculate points for a hand (for scoring)
 export const calculateHandPoints = (hand: CardType[]): number => {
   return hand.reduce((total, card) => {
     switch (card.type) {
@@ -226,12 +211,10 @@ export const calculateHandPoints = (hand: CardType[]): number => {
   }, 0);
 };
 
-// Helper function to check if a player should say UNO
 export const shouldSayUno = (hand: CardType[]): boolean => {
   return hand.length === 1;
 };
 
-// Helper function to get valid colors for wild card selection
 export const getValidColors = (): CardColor[] => {
   return [...COLORS];
 };
