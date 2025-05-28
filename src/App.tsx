@@ -1,13 +1,12 @@
 import React from "react";
-import { registerRootComponent } from 'expo';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import GameScreen from "./src/components/GameScreen";
-import TutorialScreen from "./src/components/TutorialScreen";
-import TurnScreen from "./src/components/TurnScreen";
-import WinScreen from "./src/components/WinScreen";
+import GameScreen from "./components/GameScreen";
+import TutorialScreen from "./components/TutorialScreen";
+import TurnScreen from "./components/TurnScreen";
+import WinScreen from "./components/WinScreen";
 import Toast from "react-native-toast-message";
 
 type Player = "Player 1" | "Player 2";
@@ -66,6 +65,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-// Register the app as the root component
-registerRootComponent(App);
