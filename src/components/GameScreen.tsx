@@ -12,7 +12,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Card from "./Cards";
 import ColorPickerModal from "./ColorPickerModal";
 import { useGameLogic } from "../hooks/useGameLogic";
-import type { CardType, CardColor, Player, PlayCardResult, OnBotDrawEffect } from "../gameTypes";
+import type {
+  CardType,
+  CardColor,
+  Player,
+  PlayCardResult,
+  OnBotDrawEffect,
+} from "../gameTypes";
 import { isPlayableCard } from "../gameLogic";
 
 type RootStackParamList = {
@@ -77,8 +83,12 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
       }
     | undefined
   >();
-  const [player1DrawEffect, setPlayer1DrawEffect] = useState<number | null>(null);
-  const [player2DrawEffect, setPlayer2DrawEffect] = useState<number | null>(null);
+  const [player1DrawEffect, setPlayer1DrawEffect] = useState<number | null>(
+    null
+  );
+  const [player2DrawEffect, setPlayer2DrawEffect] = useState<number | null>(
+    null
+  );
   const player1FadeAnim = useRef(new Animated.Value(0)).current;
   const player2FadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -88,7 +98,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
     (gameMode === "solo" && currentPlayer === "Player 1");
 
   const triggerEffect = (value: number, player: Player) => {
-    const setEffect = player === "Player 1" ? setPlayer1DrawEffect : setPlayer2DrawEffect;
+    const setEffect =
+      player === "Player 1" ? setPlayer1DrawEffect : setPlayer2DrawEffect;
     const fadeAnim = player === "Player 1" ? player1FadeAnim : player2FadeAnim;
 
     setEffect(value);
@@ -163,7 +174,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
     }
 
     const result = await playCard(card, index, false, onWin, onNextTurn);
-    if (result && 'drawAmount' in result && 'targetPlayer' in result) {
+    if (result && "drawAmount" in result && "targetPlayer" in result) {
       triggerEffect(result.drawAmount, result.targetPlayer);
     }
   };
@@ -174,8 +185,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
       const cardWithColor = { ...card, color };
       updateState({ currentColor: color });
 
-      const result = await playCard(cardWithColor, index, false, onWin, onNextTurn);
-      if (result && 'drawAmount' in result && 'targetPlayer' in result) {
+      const result = await playCard(
+        cardWithColor,
+        index,
+        false,
+        onWin,
+        onNextTurn
+      );
+      if (result && "drawAmount" in result && "targetPlayer" in result) {
         triggerEffect(result.drawAmount, result.targetPlayer);
       }
 
@@ -184,36 +201,49 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
     }
   };
 
-  const renderOpponentHand = () => (
-    <View style={styles.opponentHand}>
-      <View style={styles.opponentCardRow}>
-        {player2Hand.map((_, index) => (
-          <Card
-            card={{ color: null, value: "back", type: "number", order: 1 }}
-            isBack={true}
-            isPlayable={false}
-            colorBlindMode={colorBlindMode}
-            onPress={() => {}}
-            order={1}
-            key={`opponent-${index}`}
-          />
-        ))}
+  // Only show opponent hand in Solo mode
+  const renderOpponentHand = () => {
+    if (gameMode !== "solo") return null;
+
+    return (
+      <View style={styles.opponentHand}>
+        <View style={styles.opponentCardRow}>
+          {player2Hand.map((_, index) => (
+            <Card
+              card={{ color: null, value: "back", type: "number", order: 1 }}
+              isBack={true}
+              isPlayable={false}
+              colorBlindMode={colorBlindMode}
+              onPress={() => {}}
+              order={1}
+              key={`opponent-${index}`}
+            />
+          ))}
+        </View>
+        {player2DrawEffect && (
+          <Animated.Text
+            style={[
+              styles.drawEffect,
+              { opacity: player2FadeAnim, bottom: -40 },
+            ]}
+          >
+            ×{player2DrawEffect}
+          </Animated.Text>
+        )}
       </View>
-      {player2DrawEffect && (
-        <Animated.Text
-          style={[
-            styles.drawEffect,
-            { opacity: player2FadeAnim, bottom: -40 },
-          ]}
-        >
-          ×{player2DrawEffect}
-        </Animated.Text>
-      )}
-    </View>
-  );
+    );
+  };
 
   const renderPlayerHand = () => {
-    const hand = player1Hand;
+    // In Pass and Play mode, show the current player's hand
+    // In Solo mode, always show Player 1's hand
+    const hand =
+      gameMode === "pass-and-play"
+        ? currentPlayer === "Player 1"
+          ? player1Hand
+          : player2Hand
+        : player1Hand;
+
     const CARDS_PER_ROW = 5;
 
     const rows = [];
@@ -222,6 +252,29 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
     }
 
     const reversedRows = [...rows].reverse();
+
+    // Determine which draw effect to show based on current player
+    const currentDrawEffect =
+      gameMode === "pass-and-play"
+        ? currentPlayer === "Player 1"
+          ? player1DrawEffect
+          : player2DrawEffect
+        : player1DrawEffect;
+
+    const currentFadeAnim =
+      gameMode === "pass-and-play"
+        ? currentPlayer === "Player 1"
+          ? player1FadeAnim
+          : player2FadeAnim
+        : player1FadeAnim;
+
+    // Determine UNO button logic
+    const currentHandLength =
+      gameMode === "pass-and-play"
+        ? currentPlayer === "Player 1"
+          ? player1Hand.length
+          : player2Hand.length
+        : player1Hand.length;
 
     return (
       <Animated.View
@@ -260,14 +313,11 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
             })}
           </View>
         ))}
-        {player1DrawEffect && (
+        {currentDrawEffect && (
           <Animated.Text
-            style={[
-              styles.drawEffect,
-              { opacity: player1FadeAnim, top: -40 },
-            ]}
+            style={[styles.drawEffect, { opacity: currentFadeAnim, top: -40 }]}
           >
-            ×{player1DrawEffect}
+            ×{currentDrawEffect}
           </Animated.Text>
         )}
       </Animated.View>
@@ -280,7 +330,13 @@ const GameScreen: React.FC<GameScreenProps> = ({ navigation }) => {
     }
   };
 
-  const shouldShowUnoButton = player1Hand.length === 2;
+  // UNO button logic - check current player's hand length
+  const shouldShowUnoButton =
+    gameMode === "pass-and-play"
+      ? (currentPlayer === "Player 1"
+          ? player1Hand.length === 2
+          : player2Hand.length === 2) && !gameState.unoCalled
+      : player1Hand.length === 2 && !gameState.unoCalled;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -477,7 +533,7 @@ const styles = StyleSheet.create({
   placeholderText: { fontSize: 16, color: "#999" },
   playerHand: {
     position: "absolute",
-    bottom: 20,
+    bottom: 40,
     left: 0,
     right: 0,
     alignItems: "center",
@@ -494,15 +550,14 @@ const styles = StyleSheet.create({
   },
   unoButton: {
     backgroundColor: "#FFCC00",
-    padding: 15,
-    borderRadius: 10,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: 20,
+    justifyContent: "center",
     position: "absolute",
-    bottom: 0,
     left: 20,
-    right: 20,
+    bottom: 100,
   },
   drawEffect: {
     fontSize: 32,

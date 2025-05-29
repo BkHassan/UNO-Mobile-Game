@@ -356,9 +356,9 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   image: {
-    width: 60, // Reduced from 70
-    height: 85, // Reduced from 100
-    borderRadius: 8, // Slightly smaller radius
+    width: 50,
+    height: 70,
+    borderRadius: 8,
   },
   disabled: {
     opacity: 0.5,

@@ -111,13 +111,13 @@ export const useGameLogic = () => {
 
     if (!isPlayableCard(card, topCard, currentState.currentColor)) {
       if (!isBot) {
-        Toast.show({
-          type: "error",
-          text1: "Invalid Move",
-          text2: `Card must match ${currentState.currentColor} or ${
-            topCard?.value || "any"
-          }.`,
-        });
+        // Toast.show({
+        //   type: "error",
+        //   text1: "Invalid Move",
+        //   text2: `Card must match ${currentState.currentColor} or ${
+        //     topCard?.value || "any"
+        //   }.`,
+        // });
       }
       return null;
     }
@@ -172,11 +172,11 @@ export const useGameLogic = () => {
             currentPlayer: currentState.currentPlayer,
           });
 
-          Toast.show({
-            type: "info",
-            text1: "Draw 2",
-            text2: `${nextPlayer} draws 2 cards and loses their turn!`,
-          });
+          // Toast.show({
+          //   type: "info",
+          //   text1: "Draw 2",
+          //   text2: `${nextPlayer} draws 2 cards and loses their turn!`,
+          // });
 
           drawEffect = { drawAmount: 2, targetPlayer: nextPlayer };
           shouldContinueTurn = true;
@@ -195,11 +195,11 @@ export const useGameLogic = () => {
             currentPlayer: currentState.currentPlayer,
           });
 
-          Toast.show({
-            type: "info",
-            text1: card.value,
-            text2: `${nextPlayer} is skipped! ${currentState.currentPlayer} plays again!`,
-          });
+          // Toast.show({
+          //   type: "info",
+          //   text1: card.value,
+          //   text2: `${nextPlayer} is skipped! ${currentState.currentPlayer} plays again!`,
+          // });
 
           shouldContinueTurn = true;
           nextPlayer = currentState.currentPlayer;
@@ -228,11 +228,11 @@ export const useGameLogic = () => {
           currentPlayer: currentState.currentPlayer,
         });
 
-        Toast.show({
-          type: "info",
-          text1: "Wild Draw 4",
-          text2: `${nextPlayer} draws 4 cards and loses their turn!`,
-        });
+        // Toast.show({
+        //   type: "info",
+        //   text1: "Wild Draw 4",
+        //   text2: `${nextPlayer} draws 4 cards and loses their turn!`,
+        // });
 
         drawEffect = { drawAmount: 4, targetPlayer: nextPlayer };
         shouldContinueTurn = true;
@@ -277,11 +277,11 @@ export const useGameLogic = () => {
                 : currentState.player2Hand;
             const penaltyHand = [...currentPlayerHand, ...penaltyCards.cards];
 
-            Toast.show({
-              type: "error",
-              text1: "UNO Penalty",
-              text2: `${currentState.currentPlayer} forgot to say UNO!`,
-            });
+            // Toast.show({
+            //   type: "error",
+            //   text1: "UNO Penalty",
+            //   text2: `${currentState.currentPlayer} forgot to say UNO!`,
+            // });
 
             return {
               ...currentState,
@@ -413,11 +413,11 @@ export const useGameLogic = () => {
       unoCalled: false,
     });
 
-    Toast.show({
-      type: "success",
-      text1: "Card Drawn",
-      text2: `${currentState.currentPlayer} drew a card!`,
-    });
+    // Toast.show({
+    //   type: "success",
+    //   text1: "Card Drawn",
+    //   text2: `${currentState.currentPlayer} drew a card!`,
+    // });
 
     onNextTurn(nextPlayer as Player);
     setIsDrawing(false);
@@ -425,7 +425,7 @@ export const useGameLogic = () => {
 
   const callUno = () => {
     updateState({ unoCalled: true });
-    Toast.show({ type: "success", text1: "UNO!" });
+    // Toast.show({ type: "success", text1: "UNO!" });
   };
 
   const handleBotTurn = (
@@ -453,12 +453,12 @@ export const useGameLogic = () => {
       botTurnTimeoutRef.current = null;
     }
 
-    Toast.show({
-      type: "info",
-      text1: "Bot Thinking",
-      position: "top",
-      visibilityTime: 1500,
-    });
+    // Toast.show({
+    //   type: "info",
+    //   text1: "Bot Thinking",
+    //   position: "top",
+    //   visibilityTime: 1500,
+    // });
 
     botTurnTimeoutRef.current = setTimeout(() => {
       const latestState = gameStateRef.current;
@@ -525,15 +525,15 @@ export const useGameLogic = () => {
 
           cardToPlay.color = mostCommonColor as CardColor;
 
-          Toast.show({
-            type: "info",
-            text1: "Bot Chose Color",
-            text2: `Color set to ${mostCommonColor}!`,
-          });
+          // Toast.show({
+          //   type: "info",
+          //   text1: "Bot Chose Color",
+          //   text2: `Color set to ${mostCommonColor}!`,
+          // });
         }
 
         if (latestState.player2Hand.length === 2) {
-          Toast.show({ type: "info", text1: "Bot says UNO!" });
+          // Toast.show({ type: "info", text1: "Bot says UNO!" });
           updateState({ unoCalled: true });
 
           setTimeout(() => {
@@ -578,11 +578,11 @@ export const useGameLogic = () => {
         );
 
         if (result.cards.length > 0) {
-          Toast.show({
-            type: "info",
-            text1: "Bot Drew Card",
-            text2: "Bot drew a card and passed turn!",
-          });
+          // Toast.show({
+          //   type: "info",
+          //   text1: "Bot Drew Card",
+          //   text2: "Bot drew a card and passed turn!",
+          // });
 
           updateState({
             deck: result.newDeck,
@@ -602,11 +602,11 @@ export const useGameLogic = () => {
           }, 500);
         } else {
           botTurnInProgress.current = false;
-          Toast.show({
-            type: "error",
-            text1: "No Cards",
-            text2: "Bot cannot draw or play!",
-          });
+          // Toast.show({
+          //   type: "error",
+          //   text1: "No Cards",
+          //   text2: "Bot cannot draw or play!",
+          // });
         }
       }
     }, 2000);
